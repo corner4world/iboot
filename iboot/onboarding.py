@@ -1,3 +1,4 @@
+import sys
 import json
 import yaml
 import getpass
@@ -9,8 +10,8 @@ from urllib3 import encode_multipart_formdata
 def get_tokens(url_server):
     url_login = '{}/api/data'.format(url_server)
 
-    print('即将向CubeAI平台推送模型并生成微服务...')
-    print('请输入您在CubeAI平台注册的用户名和口令：\n')
+    print('即将向CubeAI平台({})推送模型并生成微服务...'.format(url_server))
+    print('请输入你在CubeAI平台({})注册的用户名和口令：\n'.format(url_server))
     username = input('username: ')
     password = getpass.getpass('password: ')
 
@@ -21,14 +22,19 @@ def get_tokens(url_server):
             'password': password,
         }
     }
-    res = requests.post(url_login, json=body)
+
+    try:
+        res = requests.post(url_login, json=body)
+    except:
+        return 'error:网站 {} 无法访问！'.format(url_server)
+
     res = json.loads(res.text, encoding='utf-8')
 
     if res['status'] == 'ok':
         tokens = res['value']
         return 'refresh_token={}; access_token={}'.format(tokens['refresh_token'], tokens['access_token'])
     else:
-        return None
+        return 'error:用户名或密码错误！'
 
 
 def get_file_name():
@@ -49,14 +55,19 @@ def get_file_name():
     return '{}.zip'.format(name)
 
 
-def onboarding(url_server='https://www.cubeai.org'):
+def onboarding():
+    if len(sys.argv) > 2:
+        url_server = sys.argv[2]
+    else:
+        url_server = 'https://cubeai.org'
+
     file_name = get_file_name()
     if file_name is None:
         return
 
     tokens = get_tokens(url_server)
-    if tokens is None:
-        print('用户名或密码错误！')
+    if tokens.startswith('error:'):
+        print(tokens[6:])
         return
 
     data = {
@@ -83,8 +94,4 @@ def onboarding(url_server='https://www.cubeai.org'):
 
 
 if __name__ == '__main__':
-    import sys
-    if len(sys.argv) > 1:
-        onboarding(sys.argv[1])
-    else:
-        onboarding()
+    onboarding()

@@ -16,5 +16,5 @@
 
 - CubeAI智立方
 
-    - https://github.com/cube-ai/cubeai
-    - https://code.ihub.org.cn/projects/1484/repository/cubeai_model_examples
+    - https://code.ihub.org.cn/projects/348   CubeAI智立方平台源码
+    - https://code.ihub.org.cn/projects/1484  基于iBoot的AI模型实例
